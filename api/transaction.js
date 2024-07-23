@@ -1,6 +1,7 @@
 const Transaction = require("../model/Transaction")
 const TransactionItem = require("../model/TransactionItem")
-const {verifyAuth} = require("../middleware/user");
+const {verifyAuth} = require("../middleware/user")
+const Product = require("../model/Product")
 
 module.exports = [
     {
@@ -28,6 +29,23 @@ module.exports = [
             }
 
             res.json({ message: "Transaction successful", transaction: resultTransaction })
+        },
+        middlewares: [verifyAuth]
+    },
+    {
+        method: "get",
+        path: "/transactions",
+        callback: async (req, res) => {
+            const model = new Transaction()
+
+            const transactions = await model.getAll()
+
+            for ( let transaction of transactions ) {
+                transaction.items = await model.__transactionItems.get({transaction_id: transaction.ID}, false)
+            }
+
+
+            res.json( transactions )
         },
         middlewares: [verifyAuth]
     },

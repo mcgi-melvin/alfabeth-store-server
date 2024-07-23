@@ -25,9 +25,15 @@ class Model {
         return newAttributes
     }
 
-    async get( where = {} ) {
-        const result = await query(`SELECT * FROM ${this._table} WHERE ${Object.keys(where).map(key => `${key}=?`).join(" AND ")} ORDER BY date_created DESC LIMIT 1 `, Object.values(where))
-        if( result ) return result[0]
+    async get( where = {}, isSingle = true ) {
+        const result = await query(`SELECT * FROM ${this._table} WHERE ${Object.keys(where).map(key => `${key}=?`).join(" AND ")} ORDER BY date_created DESC`, Object.values(where))
+        if( result ) {
+            if( isSingle ) {
+                return result[0]
+            } else {
+                return result
+            }
+        }
         return false
     }
 
